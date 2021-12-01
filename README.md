@@ -1,6 +1,7 @@
 
 Config Editor Card to edit configuration.yaml from dashboard
 
+![screenshot](https://github.com/htmltiger/config-editor-card/raw/main/screenshot.png)
 ## Installation
 
 Manually add config-editor-card.js
