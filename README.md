@@ -13,42 +13,55 @@ Please backup your files before using as there is no undo.
 ### Step 1
 You will also need to install a custom component https://github.com/htmltiger/config-editor
 
-_Manual_
-Download and copy `config_editor` directory in `custom_components`
+* **Manual**
 
-_OR_ [HACS](https://hacs.xyz/) > Integration > `Config Editor`  
+  Download and copy `config_editor` directory in `custom_components` 
 
-edit configuration.yaml and add the following so it can load
+
+* **[HACS](https://hacs.xyz/)**
+
+  Integration > `Config Editor`  
+
+
+Restart home assistant.
+
+Edit configuration.yaml and add the following so it can load
 ```
 config_editor:
 ```
+Restart home assistant.
 
 ### Step 2
-Manually add config-editor-card.js
-to your `<config>/www/` folder and add the following to the `configuration.yaml` file:
-```yaml
-lovelace:
-  resources:
-    - url: /local/config-editor-card.js?v=1
-      type: module
-```
+* **Manual** 
+ 
+  add config-editor-card.js to your `<config>/www/` folder
+  
+  add url `/local/config-editor-card.js?v=1` from Configuration -> Lovelace Dashboards -> Resources panel when not using YAML mode
+  
+  for YAML mode add the following to the `configuration.yaml` file:
+  ```yaml
+  lovelace:
+    resources:
+      - url: /local/config-editor-card.js?v=1
+        type: module
+  ```
+  
 
-_OR_ install using [HACS](https://hacs.xyz/) and add this (if in YAML mode):
-```yaml
-lovelace:
-  resources:
-    - url: /hacsfiles/config-editor-card/config-editor-card.js
-      type: module
-```
+* **[HACS](https://hacs.xyz/)**
 
-The above configuration can be managed directly in the Configuration -> Lovelace Dashboards -> Resources panel when not using YAML mode,
-or added by clicking the "Add to lovelace" button on the HACS dashboard after installing the plugin.
-
+  Frontend > `Config Editor Card`  
+  add this (if in YAML mode):
+  ```yaml
+  lovelace:
+    resources:
+      - url: /hacsfiles/config-editor-card/config-editor-card.js
+        type: module
+  ```
 
 
 
 For the dashboard, create a new tab in panel mode and add a card
-```
+```yaml
 type: custom:config-editor-card
 ```
 
