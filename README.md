@@ -34,5 +34,9 @@ edit configuration.yaml and add the following so it can load
 config_editor:
 ```
 
+For the dashboard, create a new tab in panel mode and add
+```
+type: custom:config-editor-card
+```
 
 It is also possible to add this using `+ Add Card` UI and choose `Custom: Config Editor Card`
