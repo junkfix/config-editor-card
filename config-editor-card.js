@@ -1,19 +1,17 @@
-((LitElement) => {
-
-console.info("Config Editor 1");
+console.info("Config Editor 1.1");
+const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
-const css = LitElement.prototype.css;
 
 class ConfigEditor extends LitElement {
 	
 static get properties() {
 	return {
-		_hass: {},
+		_hass: {type: Object},
 		code: {type: String},
 		fileList: {type: Array},
 		openedFile: {type: String},
 		infoLine: {type: String},
-	}
+	};
 }
 
 constructor() {
@@ -25,14 +23,15 @@ constructor() {
 }
 
 render() {
+	console.log(2);
 	if(!this._hass.states['config_editor.version']){return html`<ha-card>Missing 'config_editor:' in configuration.yaml for github.com/htmltiger/config-editor</ha-card>`;}
 	if(this.fileList.length<1){
 		this.List()
 	}
 	return html`
 	<ha-card>
-		<code>${this.infoLine}</code>
-		<div>
+		<code>#${this.infoLine}</code>
+		<div>		
 		<button @click="${this.List}">Get List</button>
 		<select @change=${this.Load} >
 		<option value=""></option>
@@ -40,15 +39,26 @@ render() {
 		</select>
 		<button @click="${this.Save}">Save</button>
 		</div>
-		<textarea rows="10" @focusout=${this.updateText} id="code">${this.code}</textarea>
+		<ha-code-editor id="code" mode="yaml" @value-changed=${this.updateText}></ha-code-editor>
 	</ha-card>
 `;
 }
 
 updateText(e) {
-	this.code = e.target.value;
+	this.code = e.detail.value;
 }
 
+async Coder(){
+	if(customElements.get("developer-tools-event")){return;}
+	await customElements.whenDefined("partial-panel-resolver");
+	const p = document.createElement('partial-panel-resolver');
+	p.hass = {panels: [{url_path: "tmp", component_name: "developer-tools"}]};
+	p._updateRoutes();
+	await p.routerOptions.routes.tmp.load()
+	await customElements.whenDefined("developer-tools-router");
+	const d = document.createElement("developer-tools-router");
+	await d.routerOptions.routes.event.load();	  
+}
 async List(){
 	this.infoLine = 'List Loading...';
 	const e=(await this._hass.callWS({type: "config_editor/ws", action: 'list', data: '', file: ''}));
@@ -56,7 +66,7 @@ async List(){
 	this.infoLine = e.msg;
 }
 async Load(x) {
-	this.code = ''; this.renderRoot.querySelector('#code').value='';this.infoLine = ':';
+	this.code = ''; this.renderRoot.querySelector('#code').value='';this.infoLine = '';
 	this.openedFile = x.target.value
 	if(!this.openedFile){return;}
 	this.infoLine = 'Loading: '+this.openedFile;
@@ -78,17 +88,12 @@ async Save() {
 	
 }
 
-static get styles() {
-	return css`
-	textarea{width:98%;height:80vh;padding:5px}
-	`;
-}
-
 getCardSize() {
 	return 5;
 }
 
 setConfig(config) {
+	this.Coder();
 }
 
 set hass(hass) {
@@ -96,14 +101,10 @@ set hass(hass) {
 }
 
 shouldUpdate(changedProps) {
-	if( changedProps.has('code') || changedProps.has('openedFile') || changedProps.has('fileList') || changedProps.has('infoLine')  ){return true;}
+	if( changedProps.has('code') || changedProps.has('openedFile') || changedProps.has('fileList') || changedProps.has('infoLine') ){return true;}
 }
 
 } customElements.define('config-editor-card', ConfigEditor);
-
-
-
-})(window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") ));
 
 window.customCards = window.customCards || [];
 window.customCards.push({
@@ -112,4 +113,3 @@ window.customCards.push({
 	preview: false,
 	description: 'Basic editor for configuration.yaml'
 });
-
