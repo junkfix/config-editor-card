@@ -23,7 +23,6 @@ constructor() {
 }
 
 render() {
-	console.log(2);
 	if(!this._hass.states['config_editor.version']){return html`<ha-card>Missing 'config_editor:' in configuration.yaml for github.com/htmltiger/config-editor</ha-card>`;}
 	if(this.fileList.length<1){
 		this.List()
@@ -57,7 +56,7 @@ async Coder(){
 	await p.routerOptions.routes.tmp.load()
 	await customElements.whenDefined("developer-tools-router");
 	const d = document.createElement("developer-tools-router");
-	await d.routerOptions.routes.event.load();	  
+	await d.routerOptions.routes.event.load();
 }
 async List(){
 	this.infoLine = 'List Loading...';
