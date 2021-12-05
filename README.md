@@ -6,6 +6,8 @@ Automaticly searches for `*.yaml` in the root and subfolders and lists in the dr
 
 ![screenshot](https://github.com/htmltiger/config-editor-card/raw/main/screenshot.png)
 
+To create a new file choose the first blank in dropdown menu and type some text and hit Save
+
 Please backup your files before using as there is no undo.
 
 ## Installation
