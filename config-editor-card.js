@@ -1,4 +1,4 @@
-console.info("Config Editor 1.1");
+console.info("Config Editor 1.2");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 
@@ -76,15 +76,19 @@ async Load(x) {
 	this.code = e.data;
 }
 async Save() {
-	if(!this.openedFile || this.renderRoot.querySelector('#code').value != this.code){
+	if(this.renderRoot.querySelector('#code').value != this.code){
 		this.infoLine='Something not right!';
 		return;
 	}
-	if(!this.code){this.infoLine='';this.infoLine = 'Text is empty!'; return;}
-	this.infoLine = 'Saving: '+this.openedFile;
-	const e=(await this._hass.callWS({type: "config_editor/ws", action: 'save', data: this.code, file: this.openedFile}));
-	this.infoLine = e.msg;
-	
+	if(!this.openedFile && this.code){
+		this.openedFile=prompt("type abc.yaml or folder/abc.yaml");
+	}
+	if(this.openedFile && this.openedFile.endsWith(".yaml")){
+		if(!this.code){this.infoLine='';this.infoLine = 'Text is empty!'; return;}
+		this.infoLine = 'Saving: '+this.openedFile;
+		const e=(await this._hass.callWS({type: "config_editor/ws", action: 'save', data: this.code, file: this.openedFile}));
+		this.infoLine = e.msg;
+	}else{this.openedFile='';}
 }
 
 getCardSize() {
