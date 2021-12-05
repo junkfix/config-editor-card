@@ -32,9 +32,8 @@ render() {
 		<code>#${this.infoLine}</code>
 		<div>		
 		<button @click="${this.List}">Get List</button>
-		<select @change=${this.Load} >
-		<option value=""></option>
-		${this.fileList.map(value => html`<option ?selected=${value === this.openedFile } value=${value}>${value}</option>`)}
+		<select @change=${this.Load}>
+		${[''].concat(this.fileList).map(value => html`<option ?selected=${value === this.openedFile } value=${value}>${value}</option>`)}
 		</select>
 		<button @click="${this.Save}">Save</button>
 		</div>
