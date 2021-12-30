@@ -61,8 +61,11 @@ Restart home assistant.
   ```
 
 
+## Add in the sidebar 
 
-For the dashboard, create a new tab in panel mode and add a card
+Configuration > Dashboards > + Add dashboard
+ 
+create a new tab in panel mode and add the card
 ```yaml
 type: custom:config-editor-card
 ```
