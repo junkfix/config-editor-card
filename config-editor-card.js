@@ -1,4 +1,4 @@
-console.info("Config Editor 1.2");
+console.info("Config Editor 1.3");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 
@@ -60,7 +60,7 @@ async Coder(){
 async List(){
 	this.infoLine = 'List Loading...';
 	const e=(await this._hass.callWS({type: "config_editor/ws", action: 'list', data: '', file: ''}));
-	this.fileList = e.file;
+	this.fileList = e.file.slice().sort();
 	this.infoLine = e.msg;
 }
 async Load(x) {
