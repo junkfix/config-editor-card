@@ -1,4 +1,4 @@
-console.info("Config Editor 1.3");
+console.info("Config Editor 1.4");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 
@@ -29,6 +29,8 @@ render() {
 	}
 	return html`
 	<ha-card>
+		<ha-code-editor id="code" mode="yaml" @value-changed=${this.updateText}></ha-code-editor>
+		<div style="position: -webkit-sticky; position: sticky; bottom: 0; z-index:2; background: var( --ha-card-background, var(--card-background-color, white) )">
 		<code>#${this.infoLine}</code>
 		<div>		
 		<button @click="${this.List}">Get List</button>
@@ -37,7 +39,7 @@ render() {
 		</select>
 		<button @click="${this.Save}">Save</button>
 		</div>
-		<ha-code-editor id="code" mode="yaml" @value-changed=${this.updateText}></ha-code-editor>
+		</div>
 	</ha-card>
 `;
 }
