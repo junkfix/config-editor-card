@@ -1,4 +1,4 @@
-console.info("Config Editor 1.4");
+console.info("Config Editor 1.5");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 
@@ -25,12 +25,17 @@ constructor() {
 render() {
 	if(!this._hass.states['config_editor.version']){return html`<ha-card>Missing 'config_editor:' in configuration.yaml for github.com/htmltiger/config-editor</ha-card>`;}
 	if(this.fileList.length<1){
-		this.List()
+		this.openedFile = localStorage.getItem('config_editorOpen');
+		if(!this.openedFile){
+			this.openedFile = '';
+		}
+		this.List();
 	}
+	
 	return html`
 	<ha-card>
 		<ha-code-editor id="code" mode="yaml" @value-changed=${this.updateText}></ha-code-editor>
-		<div style="position: -webkit-sticky; position: sticky; bottom: 0; z-index:2; background: var( --ha-card-background, var(--card-background-color, white) )">
+		<div style="position: -webkit-sticky; position: sticky; bottom: 0; z-index:2; background: var(--app-header-background-color); color: var(--app-header-text-color, white)">
 		<code>#${this.infoLine}</code>
 		<div>		
 		<button @click="${this.List}">Get List</button>
@@ -46,6 +51,12 @@ render() {
 
 updateText(e) {
 	this.code = e.detail.value;
+	localStorage.setItem('config_editorText', this.code);
+}
+
+async oldText(dhis){
+	dhis.renderRoot.querySelector('#code').value=dhis.code;
+	dhis.infoLine = html`<b style='background:#ff7a81'>Auto loaded from this browser!</b>`;
 }
 
 async Coder(){
@@ -64,17 +75,24 @@ async List(){
 	const e=(await this._hass.callWS({type: "config_editor/ws", action: 'list', data: '', file: ''}));
 	this.fileList = e.file.slice().sort();
 	this.infoLine = e.msg;
+	if(this.openedFile){
+		this.code = localStorage.getItem('config_editorText');
+		setTimeout(this.oldText, 1000, this);
+	}	
 }
 async Load(x) {
 	this.code = ''; this.renderRoot.querySelector('#code').value='';this.infoLine = '';
 	this.openedFile = x.target.value
-	if(!this.openedFile){return;}
-	this.infoLine = 'Loading: '+this.openedFile;
-	const e=(await this._hass.callWS({type: "config_editor/ws", action: 'load', data: '', file: this.openedFile}));
-	this.openedFile = e.file;
-	this.infoLine = e.msg;
-	this.renderRoot.querySelector('#code').value=e.data;
-	this.code = e.data;
+	if(this.openedFile){
+		this.infoLine = 'Loading: '+this.openedFile;
+		const e=(await this._hass.callWS({type: "config_editor/ws", action: 'load', data: '', file: this.openedFile}));
+		this.openedFile = e.file;
+		this.infoLine = e.msg;
+		this.renderRoot.querySelector('#code').value=e.data;
+		this.code = e.data;
+	}
+	localStorage.setItem('config_editorOpen', this.openedFile);
+	localStorage.setItem('config_editorText', this.code);
 }
 async Save() {
 	if(this.renderRoot.querySelector('#code').value != this.code){
