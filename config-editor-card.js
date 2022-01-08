@@ -36,7 +36,6 @@ render() {
 	<ha-card>
 		<ha-code-editor id="code" mode="yaml" @value-changed=${this.updateText}></ha-code-editor>
 		<div style="position: -webkit-sticky; position: sticky; bottom: 0; z-index:2; background: var(--app-header-background-color); color: var(--app-header-text-color, white)">
-		<code>#${this.infoLine}</code>
 		<div>		
 		<button @click="${this.List}">Get List</button>
 		<select @change=${this.Load}>
@@ -44,6 +43,7 @@ render() {
 		</select>
 		<button @click="${this.Save}">Save</button>
 		</div>
+		<code>#${this.infoLine}</code>
 		</div>
 	</ha-card>
 `;
