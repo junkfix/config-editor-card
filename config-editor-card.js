@@ -1,4 +1,4 @@
-console.info("Config Editor 1.5");
+console.info("Config Editor 1.6");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 
@@ -11,6 +11,7 @@ static get properties() {
 		fileList: {type: Array},
 		openedFile: {type: String},
 		infoLine: {type: String},
+		alertLine: {type: String},
 	};
 }
 
@@ -20,6 +21,7 @@ constructor() {
 	this.fileList = [];
 	this.openedFile = '';
 	this.infoLine = '';
+	this.alertLine = '';
 }
 
 render() {
@@ -36,6 +38,7 @@ render() {
 	<ha-card>
 		<ha-code-editor id="code" mode="yaml" @value-changed=${this.updateText}></ha-code-editor>
 		<div style="position: -webkit-sticky; position: sticky; bottom: 0; z-index:2; background: var(--app-header-background-color); color: var(--app-header-text-color, white)">
+		<div>${this.alertLine}</div>
 		<div>		
 		<button @click="${this.List}">Get List</button>
 		<select @change=${this.Load}>
@@ -54,9 +57,15 @@ updateText(e) {
 	localStorage.setItem('config_editorText', this.code);
 }
 
+Unsave(){
+	this.code = localStorage.getItem('config_editorUnsaved');
+	this.renderRoot.querySelector('#code').value=this.code;
+	localStorage.removeItem('config_editorUnsaved');
+	this.alertLine = '';
+}
+
 async oldText(dhis){
-	dhis.renderRoot.querySelector('#code').value=dhis.code;
-	dhis.infoLine = html`<b style='background:#ff7a81'>Auto loaded from this browser!</b>`;
+	dhis.Load({target:{value:dhis.openedFile}});
 }
 
 async Coder(){
@@ -76,8 +85,7 @@ async List(){
 	this.fileList = e.file.slice().sort();
 	this.infoLine = e.msg;
 	if(this.openedFile){
-		this.code = localStorage.getItem('config_editorText');
-		setTimeout(this.oldText, 1000, this);
+		setTimeout(this.oldText, 500, this);
 	}	
 }
 async Load(x) {
@@ -88,11 +96,17 @@ async Load(x) {
 		const e=(await this._hass.callWS({type: "config_editor/ws", action: 'load', data: '', file: this.openedFile}));
 		this.openedFile = e.file;
 		this.infoLine = e.msg;
+		const uns={f:localStorage.getItem('config_editorOpen'),d:localStorage.getItem('config_editorText')};
+		if(uns.f == this.openedFile && uns.d && uns.d != e.data){
+			localStorage.setItem('config_editorUnsaved', uns.d);
+			this.alertLine = html`<i style="background:#ff7a81;cursor:pointer" @click="${this.Unsave}"> Load unsaved from browser </i>`;
+		}else{
+			localStorage.removeItem('config_editorText');this.alertLine = '';
+		}
 		this.renderRoot.querySelector('#code').value=e.data;
 		this.code = e.data;
 	}
 	localStorage.setItem('config_editorOpen', this.openedFile);
-	localStorage.setItem('config_editorText', this.code);
 }
 async Save() {
 	if(this.renderRoot.querySelector('#code').value != this.code){
@@ -107,7 +121,9 @@ async Save() {
 		this.infoLine = 'Saving: '+this.openedFile;
 		const e=(await this._hass.callWS({type: "config_editor/ws", action: 'save', data: this.code, file: this.openedFile}));
 		this.infoLine = e.msg;
+		localStorage.removeItem('config_editorText');
 	}else{this.openedFile='';}
+	
 }
 
 getCardSize() {
@@ -123,7 +139,7 @@ set hass(hass) {
 }
 
 shouldUpdate(changedProps) {
-	if( changedProps.has('code') || changedProps.has('openedFile') || changedProps.has('fileList') || changedProps.has('infoLine') ){return true;}
+	if( changedProps.has('code') || changedProps.has('openedFile') || changedProps.has('fileList') || changedProps.has('alertLine') || changedProps.has('infoLine') ){return true;}
 }
 
 } customElements.define('config-editor-card', ConfigEditor);
