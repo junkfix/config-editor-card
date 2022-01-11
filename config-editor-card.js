@@ -1,4 +1,4 @@
-console.info("Config Editor 1.6");
+console.info("Config Editor 1.7");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 
@@ -36,17 +36,19 @@ render() {
 	
 	return html`
 	<ha-card>
+		<div style="min-height: calc(100vh - var(--header-height));">
 		<ha-code-editor id="code" mode="yaml" @value-changed=${this.updateText}></ha-code-editor>
-		<div style="position: -webkit-sticky; position: sticky; bottom: 0; z-index:2; background: var(--app-header-background-color); color: var(--app-header-text-color, white)">
-		<div>${this.alertLine}</div>
-		<div>		
-		<button @click="${this.List}">Get List</button>
-		<select @change=${this.Load}>
-		${[''].concat(this.fileList).map(value => html`<option ?selected=${value === this.openedFile } value=${value}>${value}</option>`)}
-		</select>
-		<button @click="${this.Save}">Save</button>
 		</div>
-		<code>#${this.infoLine}</code>
+		<div style="position: -webkit-sticky; position: sticky; bottom: 0; z-index:2; background: var(--app-header-background-color); color: var(--app-header-text-color, white)">
+			<div>${this.alertLine}</div>
+			<div>		
+			<button @click="${this.List}">Get List</button>
+			<select @change=${this.Load}>
+			${[''].concat(this.fileList).map(value => html`<option ?selected=${value === this.openedFile } value=${value}>${value}</option>`)}
+			</select>
+			<button @click="${this.Save}">Save</button>
+			</div>
+			<code>#${this.infoLine}</code>
 		</div>
 	</ha-card>
 `;
@@ -54,7 +56,7 @@ render() {
 
 updateText(e) {
 	this.code = e.detail.value;
-	localStorage.setItem('config_editorText', this.code);
+	if(this.openedFile){localStorage.setItem('config_editorText', this.code);}
 }
 
 Unsave(){
