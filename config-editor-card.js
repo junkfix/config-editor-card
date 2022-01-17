@@ -1,4 +1,4 @@
-console.info("Config Editor 1.7");
+console.info("Config Editor 1.8");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 
@@ -10,8 +10,7 @@ static get properties() {
 		code: {type: String},
 		fileList: {type: Array},
 		openedFile: {type: String},
-		infoLine: {type: String},
-		alertLine: {type: String},
+		edit: {type: Object},
 	};
 }
 
@@ -20,14 +19,13 @@ constructor() {
 	this.code = '';
 	this.fileList = [];
 	this.openedFile = '';
-	this.infoLine = '';
-	this.alertLine = '';
 }
 
 render() {
 	if(!this._hass.states['config_editor.version']){return html`<ha-card>Missing 'config_editor:' in configuration.yaml for github.com/htmltiger/config-editor</ha-card>`;}
 	if(this.fileList.length<1){
 		this.openedFile = localStorage.getItem('config_editorOpen');
+		this.edit.plainBox = localStorage.getItem('config_editorPlain') ? true : false;
 		if(!this.openedFile){
 			this.openedFile = '';
 		}
@@ -37,10 +35,11 @@ render() {
 	return html`
 	<ha-card>
 		<div style="min-height: calc(100vh - var(--header-height));">
-		<ha-code-editor id="code" mode="yaml" @value-changed=${this.updateText}></ha-code-editor>
+		${this.edit.plainBox ? html`<textarea style="width:98%;height:80vh;padding:5px;overflow-wrap:normal;white-space:pre" rows="10" @change=${this.updateText} id="code">${this.code}</textarea>` : html`<ha-code-editor id="code" mode="yaml" @value-changed=${this.updateText}></ha-code-editor>`}
+		<div style="text-align:right"><label style="cursor:pointer">Plain text <input type="checkbox" ?checked=${true === this.edit.plainBox } name="plain" value="1" @change=${this.plainChange}></label></div>
 		</div>
 		<div style="position: -webkit-sticky; position: sticky; bottom: 0; z-index:2; background: var(--app-header-background-color); color: var(--app-header-text-color, white)">
-			<div>${this.alertLine}</div>
+			<div>${this.edit.alertLine}</div>
 			<div>		
 			<button @click="${this.List}">Get List</button>
 			<select @change=${this.Load}>
@@ -48,14 +47,23 @@ render() {
 			</select>
 			<button @click="${this.Save}">Save</button>
 			</div>
-			<code>#${this.infoLine}</code>
+			<code>#${this.edit.infoLine}</code>
 		</div>
 	</ha-card>
 `;
 }
 
+plainChange(e){
+	if(this.edit.plainBox = !this.edit.plainBox){
+		localStorage.setItem('config_editorPlain','1');
+	}else{
+		localStorage.removeItem('config_editorPlain');
+	}
+	this.List();
+}
+
 updateText(e) {
-	this.code = e.detail.value;
+	this.code = this.edit.plainBox ? e.target.value : e.detail.value;
 	if(this.openedFile){localStorage.setItem('config_editorText', this.code);}
 }
 
@@ -63,7 +71,7 @@ Unsave(){
 	this.code = localStorage.getItem('config_editorUnsaved');
 	this.renderRoot.querySelector('#code').value=this.code;
 	localStorage.removeItem('config_editorUnsaved');
-	this.alertLine = '';
+	this.edit.alertLine = '';
 }
 
 async oldText(dhis){
@@ -82,28 +90,28 @@ async Coder(){
 	await d.routerOptions.routes.event.load();
 }
 async List(){
-	this.infoLine = 'List Loading...';
+	this.edit.infoLine = 'List Loading...';
 	const e=(await this._hass.callWS({type: "config_editor/ws", action: 'list', data: '', file: ''}));
+	this.edit.infoLine = e.msg;
 	this.fileList = e.file.slice().sort();
-	this.infoLine = e.msg;
 	if(this.openedFile){
 		setTimeout(this.oldText, 500, this);
 	}	
 }
 async Load(x) {
-	this.code = ''; this.renderRoot.querySelector('#code').value='';this.infoLine = '';
+	this.code = ''; this.renderRoot.querySelector('#code').value='';this.edit.infoLine = '';
 	this.openedFile = x.target.value
 	if(this.openedFile){
-		this.infoLine = 'Loading: '+this.openedFile;
+		this.edit.infoLine = 'Loading: '+this.openedFile;
 		const e=(await this._hass.callWS({type: "config_editor/ws", action: 'load', data: '', file: this.openedFile}));
 		this.openedFile = e.file;
-		this.infoLine = e.msg;
+		this.edit.infoLine = e.msg;
 		const uns={f:localStorage.getItem('config_editorOpen'),d:localStorage.getItem('config_editorText')};
 		if(uns.f == this.openedFile && uns.d && uns.d != e.data){
 			localStorage.setItem('config_editorUnsaved', uns.d);
-			this.alertLine = html`<i style="background:#ff7a81;cursor:pointer" @click="${this.Unsave}"> Load unsaved from browser </i>`;
+			this.edit.alertLine = html`<i style="background:#ff7a81;cursor:pointer" @click="${this.Unsave}"> Load unsaved from browser </i>`;
 		}else{
-			localStorage.removeItem('config_editorText');this.alertLine = '';
+			localStorage.removeItem('config_editorText');this.edit.alertLine = '';
 		}
 		this.renderRoot.querySelector('#code').value=e.data;
 		this.code = e.data;
@@ -112,17 +120,17 @@ async Load(x) {
 }
 async Save() {
 	if(this.renderRoot.querySelector('#code').value != this.code){
-		this.infoLine='Something not right!';
+		this.edit.infoLine='Something not right!';
 		return;
 	}
 	if(!this.openedFile && this.code){
 		this.openedFile=prompt("type abc.yaml or folder/abc.yaml");
 	}
 	if(this.openedFile && this.openedFile.endsWith(".yaml")){
-		if(!this.code){this.infoLine='';this.infoLine = 'Text is empty!'; return;}
-		this.infoLine = 'Saving: '+this.openedFile;
+		if(!this.code){this.edit.infoLine='';this.edit.infoLine = 'Text is empty!'; return;}
+		this.edit.infoLine = 'Saving: '+this.openedFile;
 		const e=(await this._hass.callWS({type: "config_editor/ws", action: 'save', data: this.code, file: this.openedFile}));
-		this.infoLine = e.msg;
+		this.edit.infoLine = e.msg;
 		localStorage.removeItem('config_editorText');
 	}else{this.openedFile='';}
 	
@@ -133,6 +141,7 @@ getCardSize() {
 }
 
 setConfig(config) {
+	this.edit = {options: config, alertLine:'', infoLine:'', plainBox: false};
 	this.Coder();
 }
 
@@ -141,7 +150,7 @@ set hass(hass) {
 }
 
 shouldUpdate(changedProps) {
-	if( changedProps.has('code') || changedProps.has('openedFile') || changedProps.has('fileList') || changedProps.has('alertLine') || changedProps.has('infoLine') ){return true;}
+	if( changedProps.has('code') || changedProps.has('openedFile') || changedProps.has('fileList') || changedProps.has('edit') ){return true;}
 }
 
 } customElements.define('config-editor-card', ConfigEditor);
