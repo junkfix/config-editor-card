@@ -1,4 +1,4 @@
-console.info("Config Editor 3.0");
+console.info("Config Editor 3.1");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 
@@ -145,9 +145,9 @@ async Save() {
 		return;
 	}
 	if(!this.openedFile && this.code){
-		this.openedFile=prompt("type abc.yaml or folder/abc.yaml");
+		this.openedFile=prompt("type abc."+this.edit.ext+" or folder/abc."+this.edit.ext);
 	}
-	if(this.openedFile && this.openedFile.endsWith(".yaml")){
+	if(this.openedFile && this.openedFile.endsWith("."+this.edit.ext)){
 		if(!this.code){this.infoLine='';this.infoLine = 'Text is empty!'; return;}
 		this.infoLine = 'Saving: '+this.openedFile;
 		const e=(await this._hass.callWS({type: "config_editor/ws", action: 'save', data: this.code, file: this.openedFile, ext: this.edit.ext}));
