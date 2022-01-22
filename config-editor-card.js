@@ -1,4 +1,4 @@
-console.info("Config Editor 3.3");
+console.info("Config Editor 3.4");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -124,6 +124,7 @@ Unsave(){
 	this.renderRoot.querySelector('#code').value=this.code;
 	this.localSet('Unsaved','');
 	this.alertLine = '';
+	this.Toast("Loaded from browser",1500);
 }
 
 localGet(e){
@@ -145,6 +146,13 @@ saveList(){
 
 oldText(dhis){
 	dhis.Load({target:{value:dhis.openedFile}});
+}
+
+Toast(message, time){
+	const e = new Event("hass-notification",
+		{bubbles: true, cancelable: false, composed: true});
+	e.detail = {message, duration: time};
+	document.querySelector("home-assistant").dispatchEvent(e);
 }
 
 async Coder(){
@@ -178,6 +186,7 @@ async Load(x) {
 		const e=await this.cmd('load','',this.openedFile);
 		this.openedFile = e.file;
 		this.infoLine = e.msg;
+		this.Toast(this.infoLine,1500);
 		const uns={f:this.localGet('Open'),
 			d:this.localGet('Text')};
 		if(uns.f == this.openedFile && uns.d && uns.d != e.data){
@@ -208,6 +217,7 @@ async Save() {
 		this.infoLine = 'Saving: '+this.openedFile;
 		const e=await this.cmd('save', this.code, this.openedFile);
 		this.infoLine = e.msg;
+		this.Toast(this.infoLine,2000);
 		if(e.msg.includes('Saved:')){
 			this.localSet('Text','');
 			if(savenew){
