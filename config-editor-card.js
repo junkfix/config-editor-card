@@ -78,10 +78,10 @@ render() {
 			name="plain" value="1" @change=${this.plainChange}></label>
 		</div>
 		${this.edit.plainBox ?
-		html`<textarea rows="10"
-			@change=${this.updateText} id="code">${this.code}</textarea>`:
-		html`<ha-code-editor id="code" @keydown=${this.saveKey} .hass=${this._hass} hasAutocomplete mode="yaml"
-		@value-changed=${this.updateText} dir="ltr"></ha-code-editor>`}
+		html`<textarea rows="10" id="code" @keydown=${this.saveKey}
+			@change=${this.updateText}>${this.code}</textarea>`:
+		html`<ha-code-editor id="code" @keydown=${this.saveKey} hasAutocomplete mode="yaml"
+		@value-changed=${this.updateText} dir="ltr" .hass=${this._hass}></ha-code-editor>`}
 		</div>
 		<div class="bar">
 			<div>${this.alertLine}</div>
