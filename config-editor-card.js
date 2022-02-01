@@ -1,4 +1,4 @@
-console.info("Config Editor 3.4");
+console.info("Config Editor 3.5");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -73,15 +73,15 @@ render() {
 			html`<option ?selected=${value === this.edit.ext }
 				value=${value}>${value.toUpperCase()}</option>`)}
 			</select>
-			<label>Plain text <input type="checkbox"
+			<label>Basic Editor<input type="checkbox"
 			?checked=${this.edit.plainBox=='1'}
 			name="plain" value="1" @change=${this.plainChange}></label>
 		</div>
 		${this.edit.plainBox ?
 		html`<textarea rows="10"
 			@change=${this.updateText} id="code">${this.code}</textarea>`:
-		html`<ha-code-editor id="code" mode="yaml"
-		@value-changed=${this.updateText}></ha-code-editor>`}
+		html`<ha-code-editor id="code" @keydown=${this.saveKey} .hass=${this._hass} hasAutocomplete mode="yaml"
+		@value-changed=${this.updateText} dir="ltr"></ha-code-editor>`}
 		</div>
 		<div class="bar">
 			<div>${this.alertLine}</div>
@@ -98,6 +98,7 @@ render() {
 		</div>
 	</ha-card>
 `;
+
 }
 
 extChange(e){
@@ -115,6 +116,7 @@ plainChange(){
 }
 
 updateText(e) {
+	e.stopPropagation();
 	this.code = this.edit.plainBox ? e.target.value : e.detail.value;
 	if(this.openedFile){this.localSet('Text', this.code);}
 }
@@ -148,23 +150,40 @@ oldText(dhis){
 	dhis.Load({target:{value:dhis.openedFile}});
 }
 
-Toast(message, time){
-	const e = new Event("hass-notification",
-		{bubbles: true, cancelable: false, composed: true});
-	e.detail = {message, duration: time};
-	document.querySelector("home-assistant").dispatchEvent(e);
+saveKey(e) {
+	if((e.key == 'S' || e.key == 's' ) && (e.ctrlKey || e.metaKey)){
+		e.preventDefault();
+		this.Save();
+		return false;
+	}
+	return true;
 }
 
+
+Toast(message, duration){
+	const e = new Event("hass-notification",
+		{bubbles: true, cancelable: false, composed: true});
+	e.detail = {message, duration, dismissable: true,
+		//action: {text:"Save",action:()=>{this.sureSave();}},
+	};
+	document.querySelector("home-assistant").dispatchEvent(e);
+}
+//sureSave(){console.log(this.openedFile);}
+
 async Coder(){
-	if(customElements.get("developer-tools-event")){return;}
+	const c="ha-yaml-editor";
+	if(customElements.get(c)){return;}
 	await customElements.whenDefined("partial-panel-resolver");
 	const p = document.createElement('partial-panel-resolver');
-	p.hass = {panels: [{url_path: "tmp", component_name: "developer-tools"}]};
+	p.hass = {panels: [{url_path: "tmp", component_name: "config"}]};
 	p._updateRoutes();
 	await p.routerOptions.routes.tmp.load();
-	await customElements.whenDefined("developer-tools-router");
-	const d = document.createElement("developer-tools-router");
-	await d.routerOptions.routes.event.load();
+	const d=document.createElement("ha-panel-config");
+	await d.routerOptions.routes.automation.load();
+	if(!customElements.get(c)){
+		this.localSet('Plain', 1);
+		console.log('failed '+c);
+	}
 }
 
 async List(){
@@ -179,6 +198,10 @@ async List(){
 }
 
 async Load(x) {
+	if(x.target.value == this.openedFile && this.code){return;}
+	if(this.edit.orgCode.trim() != this.code.trim()){
+		if(!confirm("Switch without Saving?")){x.target.value = this.openedFile; return;}
+	}
 	this.code = ''; this.renderRoot.querySelector('#code').value='';this.infoLine = '';
 	this.openedFile = x.target.value;
 	if(this.openedFile){
@@ -186,7 +209,7 @@ async Load(x) {
 		const e=await this.cmd('load','',this.openedFile);
 		this.openedFile = e.file;
 		this.infoLine = e.msg;
-		this.Toast(this.infoLine,1500);
+		this.Toast(this.infoLine,1000);
 		const uns={f:this.localGet('Open'),
 			d:this.localGet('Text')};
 		if(uns.f == this.openedFile && uns.d && uns.d != e.data){
@@ -199,6 +222,7 @@ async Load(x) {
 		this.renderRoot.querySelector('#code').value=e.data;
 		this.code = e.data;
 	}
+	this.edit.orgCode = this.code;
 	this.localSet('Open', this.openedFile);
 }
 
@@ -213,6 +237,7 @@ async Save() {
 		savenew=1;
 	}
 	if(this.openedFile && this.openedFile.endsWith("."+this.edit.ext)){
+		if(!confirm("Save?")){if(savenew){this.openedFile='';}return;}
 		if(!this.code){this.infoLine=''; this.infoLine = 'Text is empty!'; return;}
 		this.infoLine = 'Saving: '+this.openedFile;
 		const e=await this.cmd('save', this.code, this.openedFile);
@@ -226,7 +251,7 @@ async Save() {
 			}
 		}
 	}else{this.openedFile='';}
-	
+	this.edit.orgCode = this.code;
 }
 
 getCardSize() {
@@ -234,7 +259,7 @@ getCardSize() {
 }
 
 setConfig(config) {
-	this.edit = {options: config, plainBox: false, ext: ''};
+	this.edit = {options: config, plainBox: false, ext: '', orgCode: ''};
 	this.Coder();
 }
 
