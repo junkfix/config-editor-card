@@ -50,7 +50,7 @@ Restart home assistant.
 
 Configuration > Dashboards > + Add dashboard
  
-create a new tab in panel mode and add the card
+create a new tab in panel mode and add the card [more info](https://github.com/htmltiger/config-editor-card/issues/29)
 ```yaml
 type: custom:config-editor-card
 ```
