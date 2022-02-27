@@ -1,4 +1,4 @@
-console.info("Config Editor 3.5");
+console.info("Config Editor 3.6");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -35,8 +35,9 @@ static get styles() {
 		overflow-wrap:normal;
 		white-space:pre}
 	.top{min-height:calc(100vh - var(--header-height))}
-	.pin{text-align:right}
+	.pin{display:flex}
 	.pin label{cursor:pointer}
+	.right{text-align:right;flex-grow:1}
 	.bar{
 		position:-webkit-sticky;
 		position:sticky;
@@ -56,7 +57,7 @@ render() {
 	if(this.fileList.length<1){
 		this.openedFile = this.localGet('Open')||'';
 		this.edit.ext = this.localGet('Ext')||'yaml';
-		this.edit.plainBox = this.localGet('Plain')||'';
+		this.edit.basic = this.localGet('Basic')||'';
 		if(this.fileList = JSON.parse(this.localGet('List'+this.edit.ext))){
 			if(this.openedFile.endsWith("."+this.edit.ext)){
 				setTimeout(this.oldText, 500, this);
@@ -68,21 +69,25 @@ render() {
 	<ha-card>
 		<div class="top">
 		<div class="pin">
+			<div class="left"><button @click="${this.reLoad}">Reload</button></div>
+			<div class="right">
 			<select @change=${this.extChange}>
 			${["yaml","py","json","conf","js","txt","log"].map(value =>
 			html`<option ?selected=${value === this.edit.ext }
 				value=${value}>${value.toUpperCase()}</option>`)}
 			</select>
-			<label>Basic Editor<input type="checkbox"
-			?checked=${this.edit.plainBox=='1'}
-			name="plain" value="1" @change=${this.plainChange}></label>
+			<label>Basic Editor<input type="checkbox" ?checked=${this.edit.basic=='1'}
+			name="basic" value="1" @change=${this.basicChange}></label>
+			</div>
 		</div>
-		${this.edit.plainBox ?
-		html`<textarea rows="10" id="code" @keydown=${this.saveKey}
-			@change=${this.updateText}>${this.code}</textarea>`:
-		html`<ha-code-editor id="code" @keydown=${this.saveKey} hasAutocomplete mode="yaml"
-		@value-changed=${this.updateText} dir="ltr" .hass=${this._hass}></ha-code-editor>`}
+		${this.edit.basic ?
+		html`<textarea rows="10" ?readonly=${!0==this.edit.readonly}
+			@change=${this.updateText} id="code" @keydown=${this.saveKey}>${this.code}</textarea>`:
+		html`<ha-code-editor id="code" mode="yaml" ?readOnly=${!0==this.edit.readonly}
+			@keydown=${this.saveKey} .hass=${this._hass} @value-changed=${this.updateText}
+			dir="ltr" autocomplete-entities></ha-code-editor>`}
 		</div>
+		${this.edit.hidefooter ? '' : html`
 		<div class="bar">
 			<div>${this.alertLine}</div>
 			<div>		
@@ -91,11 +96,11 @@ render() {
 			${[''].concat(this.fileList).map(value =>
 			html`<option ?selected=${value === this.openedFile}
 				value=${value}>${value}</option>`)}
-			</select>
-			<button @click="${this.Save}">Save</button>
+			</select>${!this.edit.readonly ?
+			html`<button @click="${this.Save}">Save</button>`:''}
 			</div>
 			<code>#${this.infoLine}</code>
-		</div>
+		</div>`}
 	</ha-card>
 `;
 
@@ -109,15 +114,15 @@ extChange(e){
 	this.List();
 }
 
-plainChange(){
-	this.edit.plainBox = this.edit.plainBox?'':'1';
-	this.localSet('Plain', this.edit.plainBox);
+basicChange(){
+	this.edit.basic = this.edit.basic?'':'1';
+	this.localSet('Basic', this.edit.basic);
 	this.List();
 }
 
 updateText(e) {
 	e.stopPropagation();
-	this.code = this.edit.plainBox ? e.target.value : e.detail.value;
+	this.code = this.edit.basic ? e.target.value : e.detail.value;
 	if(this.openedFile){this.localSet('Text', this.code);}
 }
 
@@ -146,6 +151,9 @@ saveList(){
 	this.localSet('List'+this.edit.ext, JSON.stringify(this.fileList));
 }
 
+reLoad(e){
+	this.Load({target:{value:this.openedFile},reload:1});
+}
 oldText(dhis){
 	dhis.Load({target:{value:dhis.openedFile}});
 }
@@ -181,7 +189,7 @@ async Coder(){
 	const d=document.createElement("ha-panel-config");
 	await d.routerOptions.routes.automation.load();
 	if(!customElements.get(c)){
-		this.localSet('Plain', 1);
+		this.localSet('Basic', 1);
 		console.log('failed '+c);
 	}
 }
@@ -198,7 +206,7 @@ async List(){
 }
 
 async Load(x) {
-	if(x.target.value == this.openedFile && this.code){return;}
+	if(x.target.value == this.openedFile && this.code && !x.hasOwnProperty('reload')){return;}
 	if(this.edit.orgCode.trim() != this.code.trim()){
 		if(!confirm("Switch without Saving?")){x.target.value = this.openedFile; return;}
 	}
@@ -227,7 +235,7 @@ async Load(x) {
 }
 
 async Save() {
-	if(this.renderRoot.querySelector('#code').value != this.code){
+	if(this.renderRoot.querySelector('#code').value != this.code || this.edit.readonly){
 		this.infoLine='Something not right!';
 		return;
 	}
@@ -259,7 +267,14 @@ getCardSize() {
 }
 
 setConfig(config) {
-	this.edit = {options: config, plainBox: false, ext: '', orgCode: ''};
+	this.edit = {file: '', hidefooter: false, readonly: false, basic: false, ext: '', orgCode: '', ...config};
+	if(this.edit.file){
+		const f=this.edit.file.split('.')[1];
+		if(f){
+			this.localSet('Open', this.edit.file);
+			this.localSet('Ext', f);
+		}
+	}
 	this.Coder();
 }
 

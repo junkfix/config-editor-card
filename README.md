@@ -61,6 +61,13 @@ It is also possible to add this using `+ Add Card` UI and choose `Custom: Config
 #### To create a new file 
 choose the first blank in dropdown menu and type some text and hit Save
 
+#### Advanced Config
 
+| Name | Default | Description
+| ---- | ------- | -----------
+| file |  | autoload file eg. `home-assistant.log`
+| readonly | `false` | read only
+| hidefooter | `false` | 
+| basic | `false` | Force basic editor
 
 Please backup your files before using as there is no undo.
