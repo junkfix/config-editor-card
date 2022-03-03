@@ -69,5 +69,6 @@ choose the first blank in dropdown menu and type some text and hit Save
 | readonly | `false` | read only
 | hidefooter | `false` | 
 | basic | `false` | Force basic editor
+| size | `100` | font size in %
 
 Please backup your files before using as there is no undo.
