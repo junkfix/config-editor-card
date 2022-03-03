@@ -1,4 +1,4 @@
-console.info("Config Editor 3.9");
+console.info("Config Editor 3.10");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -34,18 +34,35 @@ static get styles() {
 		padding:5px;
 		overflow-wrap:normal;
 		white-space:pre}
-	.top{min-height:calc(100vh - var(--header-height))}
-	.pin{display:flex}
-	.pin label{cursor:pointer}
-	.right{text-align:right;flex-grow:1}
+	.top{
+		min-height:calc(95vh - var(--header-height))}
+	.pin,.filebar{
+		display:flex}
+	.pin label{
+		cursor:pointer}
+	.right{text-align:right;
+		flex-grow:1}
+	.right button{
+		font-family:Times,serif;
+		font-weight:bold}
 	.bar{
 		position:-webkit-sticky;
 		position:sticky;
 		bottom:0;
 		z-index:2;
 		background:var(--app-header-background-color);
-		color:var(--app-header-text-color,white)}
-	.bar i{background:#ff7a81;cursor:pointer}
+		color:var(--app-header-text-color,white);
+		white-space:nowrap;
+		overflow:hidden;
+		text-overflow:ellipsis}
+	.bar i{
+		background:#ff7a81;
+		cursor:pointer}
+	.bar select{
+		flex-grow:1;
+		text-overflow:ellipsis;
+		width:100%;
+		overflow:hidden}
 	`;
 }
 
@@ -71,6 +88,9 @@ render(){
 		<div class="pin">
 			<div class="left"><button @click="${this.reLoad}">Reload</button></div>
 			<div class="right">
+			<button @click="${e=>this.txtSize(0)}">-</button>
+			<button @click="${e=>this.txtSize(2)}">A</button>
+			<button @click="${e=>this.txtSize(1)}">+</button>
 			<select @change=${this.extChange}>
 			${["yaml","py","json","conf","js","txt","log"].map(value =>
 			html`<option ?selected=${value === this.edit.ext }
@@ -90,20 +110,35 @@ render(){
 		${this.edit.hidefooter ? '' : html`
 		<div class="bar">
 			<div>${this.alertLine}</div>
-			<div>		
-			<button @click="${this.List}">Get List</button>
+			<div class="filebar">${!this.edit.readonly ?
+			html`<button @click="${this.Save}">Save</button>`:''}
 			<select @change=${this.Load}>
 			${[''].concat(this.fileList).map(value =>
 			html`<option ?selected=${value === this.openedFile}
 				value=${value}>${value}</option>`)}
-			</select>${!this.edit.readonly ?
-			html`<button @click="${this.Save}">Save</button>`:''}
+			</select>
+			<button @click="${this.List}">Get List</button>
 			</div>
 			<code>#${this.infoLine}</code>
 		</div>`}
 	</ha-card>
 `;
 
+}
+
+txtSize(e){
+	if(e<3){
+		if(e>1){
+			this.edit.size=100;
+		}else if(e>0){
+			this.edit.size+=5;
+		}else{
+			this.edit.size-=5;
+		}
+		this.localSet('Size', this.edit.size);
+		this.infoLine = 'size: '+this.edit.size;
+	}
+	this.renderRoot.querySelector('#code').style.fontSize=this.edit.size+'%';
 }
 
 extChange(e){
@@ -206,14 +241,14 @@ async List(){
 	this.saveList();
 	if(this.openedFile.endsWith("."+this.edit.ext)){
 		setTimeout(this.oldText, 500, this);
-	}	
+	}
 }
 
 async Load(x) {
 	if(x.target.value == this.openedFile && this.code && !x.hasOwnProperty('reload')){return;}
 	if(this.edit.orgCode.trim() != this.code.trim()){
 		if(!confirm("Switch without Saving?")){x.target.value = this.openedFile; return;}
-	}	
+	}
 	this.code = ''; this.renderRoot.querySelector('#code').value='';this.infoLine = '';
 	this.openedFile = x.target.value;
 	if(this.openedFile){
@@ -236,6 +271,7 @@ async Load(x) {
 	}
 	this.edit.orgCode = this.code;
 	this.localSet('Open', this.openedFile);
+	this.txtSize(3);
 }
 
 async Save() {
@@ -271,13 +307,16 @@ getCardSize() {
 }
 
 setConfig(config) {
-	this.edit = {file: '', hidefooter: false, readonly: false, basic: false, ext: '', orgCode: '', coder:1, ...config};
+	this.edit = {file: '', hidefooter: false, readonly: false, basic: false, size: 0, ext: '', orgCode: '', coder:1, ...config};
 	if(this.edit.file){
 		const f=this.edit.file.split('.')[1];
 		if(f){
 			this.localSet('Open', this.edit.file);
 			this.localSet('Ext', f);
 		}
+	}
+	if(!this.edit.size){
+		this.edit.size=Number(this.localGet('Size'))||100;
 	}
 	this.Coder();
 }
