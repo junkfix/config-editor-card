@@ -180,18 +180,20 @@ Toast(message, duration){
 
 async Coder(){
 	const c="ha-yaml-editor";
-	if(customElements.get(c)){return;}
-	await customElements.whenDefined("partial-panel-resolver");
-	const p = document.createElement('partial-panel-resolver');
-	p.hass = {panels: [{url_path: "tmp", component_name: "config"}]};
-	p._updateRoutes();
-	await p.routerOptions.routes.tmp.load();
-	const d=document.createElement("ha-panel-config");
-	await d.routerOptions.routes.automation.load();
+	if(!customElements.get(c)){
+		await customElements.whenDefined("partial-panel-resolver");
+		const p = document.createElement('partial-panel-resolver');
+		p.hass = {panels: [{url_path: "tmp", component_name: "config"}]};
+		p._updateRoutes();
+		await p.routerOptions.routes.tmp.load();
+		const d=document.createElement("ha-panel-config");
+		await d.routerOptions.routes.automation.load();
+	}
 	if(!document.createElement(c)){
 		this.localSet('Basic', 1);
 		console.log('failed '+c);
 	}
+	
 }
 
 async List(){
