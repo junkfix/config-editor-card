@@ -1,4 +1,4 @@
-console.info("Config Editor 3.7");
+console.info("Config Editor 3.9");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -48,7 +48,8 @@ static get styles() {
 	.bar i{background:#ff7a81;cursor:pointer}
 	`;
 }
-render() {
+
+render(){
 	const hver=this._hass.states['config_editor.version'];
 	if(!hver){return html`<ha-card>Missing 'config_editor:' in configuration.yaml
 		for github.com/htmltiger/config-editor</ha-card>`;}
@@ -64,7 +65,6 @@ render() {
 			}
 		}else{this.List();}
 	}
-	
 	return html`
 	<ha-card>
 		<div class="top">
@@ -80,7 +80,7 @@ render() {
 			name="basic" value="1" @change=${this.basicChange}></label>
 			</div>
 		</div>
-		${this.edit.basic ?
+		${(this.edit.basic || this.edit.coder ) ?
 		html`<textarea rows="10" ?readonly=${!0==this.edit.readonly}
 			@change=${this.updateText} id="code" @keydown=${this.saveKey}>${this.code}</textarea>`:
 		html`<ha-code-editor id="code" mode="yaml" ?readOnly=${!0==this.edit.readonly}
@@ -117,7 +117,7 @@ extChange(e){
 basicChange(){
 	this.edit.basic = this.edit.basic?'':'1';
 	this.localSet('Basic', this.edit.basic);
-	this.List();
+	this.reLoad();
 }
 
 updateText(e) {
@@ -189,11 +189,13 @@ async Coder(){
 		const d=document.createElement("ha-panel-config");
 		await d.routerOptions.routes.automation.load();
 	}
-	if(!document.createElement(c)){
+	const a=document.createElement(c);
+	this.edit.coder=0;
+	if(!a){
 		this.localSet('Basic', 1);
 		console.log('failed '+c);
 	}
-	
+	this.render();
 }
 
 async List(){
@@ -211,7 +213,7 @@ async Load(x) {
 	if(x.target.value == this.openedFile && this.code && !x.hasOwnProperty('reload')){return;}
 	if(this.edit.orgCode.trim() != this.code.trim()){
 		if(!confirm("Switch without Saving?")){x.target.value = this.openedFile; return;}
-	}
+	}	
 	this.code = ''; this.renderRoot.querySelector('#code').value='';this.infoLine = '';
 	this.openedFile = x.target.value;
 	if(this.openedFile){
@@ -269,7 +271,7 @@ getCardSize() {
 }
 
 setConfig(config) {
-	this.edit = {file: '', hidefooter: false, readonly: false, basic: false, ext: '', orgCode: '', ...config};
+	this.edit = {file: '', hidefooter: false, readonly: false, basic: false, ext: '', orgCode: '', coder:1, ...config};
 	if(this.edit.file){
 		const f=this.edit.file.split('.')[1];
 		if(f){
