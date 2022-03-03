@@ -1,4 +1,4 @@
-console.info("Config Editor 3.6");
+console.info("Config Editor 3.7");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -188,7 +188,7 @@ async Coder(){
 	await p.routerOptions.routes.tmp.load();
 	const d=document.createElement("ha-panel-config");
 	await d.routerOptions.routes.automation.load();
-	if(!customElements.get(c)){
+	if(!document.createElement(c)){
 		this.localSet('Basic', 1);
 		console.log('failed '+c);
 	}
