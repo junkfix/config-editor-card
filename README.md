@@ -59,7 +59,7 @@ type: custom:config-editor-card
 It is also possible to add this using `+ Add Card` UI and choose `Custom: Config Editor Card`
 
 #### To create a new file 
-choose the first blank in dropdown menu and type some text and hit Save
+choose the first blank in dropdown menu and type some text and hit Save or ctrl+s
 
 #### Advanced Config
 
