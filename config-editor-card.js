@@ -1,4 +1,4 @@
-console.info("Config Editor 3.10");
+console.info("Config Editor 4.0");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -67,10 +67,10 @@ static get styles() {
 }
 
 render(){
-	const hver=this._hass.states['config_editor.version'];
+	const hver=this._hass ? this._hass.states['config_editor.version']:0;
 	if(!hver){return html`<ha-card>Missing 'config_editor:' in configuration.yaml
 		for github.com/htmltiger/config-editor</ha-card>`;}
-	if(hver.state != '3'){return html`<ha-card>Please upgrade
+	if(hver.state != '4'){return html`<ha-card>Please upgrade
 		github.com/htmltiger/config-editor</ha-card>`;}
 	if(this.fileList.length<1){
 		this.openedFile = this.localGet('Open')||'';
@@ -92,7 +92,7 @@ render(){
 			<button @click="${e=>this.txtSize(2)}">A</button>
 			<button @click="${e=>this.txtSize(1)}">+</button>
 			<select @change=${this.extChange}>
-			${["yaml","py","json","conf","js","txt","log"].map(value =>
+			${["yaml","py","json","conf","js","txt","log","all"].map(value =>
 			html`<option ?selected=${value === this.edit.ext }
 				value=${value}>${value.toUpperCase()}</option>`)}
 			</select>
@@ -274,6 +274,11 @@ async Load(x) {
 	this.txtSize(3);
 }
 
+extOk(f){
+	if(f.length && (this.edit.ext=='all' || f.endsWith("."+this.edit.ext) )){return 1;}
+	return 0;
+}
+
 async Save() {
 	if(this.renderRoot.querySelector('#code').value != this.code || this.edit.readonly){
 		this.infoLine='Something not right!';
@@ -284,7 +289,7 @@ async Save() {
 		this.openedFile=prompt("type abc."+this.edit.ext+" or folder/abc."+this.edit.ext);
 		savenew=1;
 	}
-	if(this.openedFile && this.openedFile.endsWith("."+this.edit.ext)){
+	if(this.extOk(this.openedFile)){
 		if(!confirm("Save?")){if(savenew){this.openedFile='';}return;}
 		if(!this.code){this.infoLine=''; this.infoLine = 'Text is empty!'; return;}
 		this.infoLine = 'Saving: '+this.openedFile;
