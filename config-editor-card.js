@@ -1,4 +1,4 @@
-console.info("Config Editor 4.0");
+console.info("Config Editor 4.1");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -179,7 +179,7 @@ localSet(k,v){
 
 cmd(action, data, file){
 	return this._hass.callWS({type: "config_editor/ws", action: action,
-	data: data, file: file, ext: this.edit.ext});
+	data: data, file: file, ext: this.edit.ext, depth: this.edit.depth});
 }
 
 saveList(){
@@ -312,7 +312,7 @@ getCardSize() {
 }
 
 setConfig(config) {
-	this.edit = {file: '', hidefooter: false, readonly: false, basic: false, size: 0, ext: '', orgCode: '', coder:1, ...config};
+	this.edit = {file: '', hidefooter: false, readonly: false, basic: false, size: 0, depth: 2, ext: '', orgCode: '', coder:1, ...config};
 	if(this.edit.file){
 		const f=this.edit.file.split('.')[1];
 		if(f){
