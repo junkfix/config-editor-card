@@ -70,5 +70,6 @@ choose the first blank in dropdown menu and type some text and hit Save or ctrl+
 | hidefooter | `false` | 
 | basic | `false` | Force basic editor
 | size | `100` | font size
+| depth | `2` | subfolder depth 0 or more
 
 Please backup your files before using as there is no undo.
