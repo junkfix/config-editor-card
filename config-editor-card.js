@@ -1,4 +1,4 @@
-console.info("Config Editor 4.1");
+console.info("Config Editor 4.2");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -77,7 +77,7 @@ render(){
 		this.edit.ext = this.localGet('Ext')||'yaml';
 		this.edit.basic = this.localGet('Basic')||'';
 		if(this.fileList = JSON.parse(this.localGet('List'+this.edit.ext))){
-			if(this.openedFile.endsWith("."+this.edit.ext)){
+			if(this.extOk(this.openedFile)){
 				setTimeout(this.oldText, 500, this);
 			}
 		}else{this.List();}
@@ -239,7 +239,7 @@ async List(){
 	this.infoLine = e.msg;
 	this.fileList = e.file.slice().sort();
 	this.saveList();
-	if(this.openedFile.endsWith("."+this.edit.ext)){
+	if(this.extOk(this.openedFile)){
 		setTimeout(this.oldText, 500, this);
 	}
 }
