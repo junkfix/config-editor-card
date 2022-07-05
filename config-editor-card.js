@@ -105,7 +105,7 @@ render(){
 			@change=${this.updateText} id="code" @keydown=${this.saveKey}>${this.code}</textarea>`:
 		html`<ha-code-editor id="code" mode="yaml" ?readOnly=${!0==this.edit.readonly}
 			@keydown=${this.saveKey} .hass=${this._hass} @value-changed=${this.updateText}
-			dir="ltr" autocomplete-entities></ha-code-editor>`}
+			dir="ltr" autocomplete-entities autocomplete-icons></ha-code-editor>`}
 		</div>
 		${this.edit.hidefooter ? '' : html`
 		<div class="bar">
