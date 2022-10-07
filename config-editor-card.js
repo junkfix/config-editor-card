@@ -1,4 +1,4 @@
-console.info("Config Editor 4.3");
+console.info("Config Editor 4.4");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
