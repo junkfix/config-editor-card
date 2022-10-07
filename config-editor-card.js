@@ -1,4 +1,4 @@
-console.info("Config Editor 4.2");
+console.info("Config Editor 4.3");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -45,9 +45,14 @@ static get styles() {
 	.right button{
 		font-family:Times,serif;
 		font-weight:bold}
-	.bar{
+	.pin,.bar{
 		position:-webkit-sticky;
 		position:sticky;
+		z-index:2;}
+	.pin{
+		top: var(--header-height, 0);
+		background:var(--secondary-background-color)}
+	.bar{
 		bottom:0;
 		z-index:2;
 		background:var(--app-header-background-color);
