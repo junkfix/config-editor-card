@@ -38,7 +38,9 @@ Restart home assistant.
   Frontend > `Config Editor Card`  
 
 * **Manual** 
- 
+  
+  Enable "Advanced Mode" from your user profile page
+  
   add config-editor-card.js to your `<config>/www/` folder
   
   add url `/local/config-editor-card.js?v=1` from Configuration -> Lovelace Dashboards -> Resources panel when not using YAML mode
