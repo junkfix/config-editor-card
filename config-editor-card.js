@@ -1,4 +1,4 @@
-console.info("Config Editor 4.4");
+console.info("Config Editor 4.5");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -35,7 +35,7 @@ static get styles() {
 		overflow-wrap:normal;
 		white-space:pre}
 	.top{
-		min-height:calc(95vh - var(--header-height))}
+		min-height:calc(95vh - var(--header-height,56px))}
 	.pin,.filebar{
 		display:flex}
 	.pin label{
@@ -51,11 +51,11 @@ static get styles() {
 		z-index:2;}
 	.pin{
 		top: var(--header-height, 0);
-		background:var(--secondary-background-color)}
+		background:var(--secondary-background-color,silver)}
 	.bar{
 		bottom:0;
 		z-index:2;
-		background:var(--app-header-background-color);
+		background:var(--app-header-background-color,gray);
 		color:var(--app-header-text-color,white);
 		white-space:nowrap;
 		overflow:hidden;
@@ -72,11 +72,11 @@ static get styles() {
 }
 
 render(){
-	const hver=this._hass ? this._hass.states['config_editor.version']:0;
-	if(!hver){return html`<ha-card>Missing 'config_editor:' in configuration.yaml
-		for github.com/htmltiger/config-editor</ha-card>`;}
-	if(hver.state != '4'){return html`<ha-card>Please upgrade
-		github.com/htmltiger/config-editor</ha-card>`;}
+	const targetver=4;
+	const hver=this._hass ? this._hass.states['config_editor.version']:{state:0};
+	const dlink=html`<a href="https://github.com/htmltiger/config-editor">download</a>`;
+	if(!hver.state){return html`<ha-card>Missing 'config_editor:' in configuration.yaml ${dlink}</ha-card>`;}
+	if(hver.state != targetver){return html`<ha-card>Please ${dlink} upgrade from ${hver.state} to ${targetver}</ha-card>`;}
 	if(this.fileList.length<1){
 		this.openedFile = this.localGet('Open')||'';
 		this.edit.ext = this.localGet('Ext')||'yaml';
@@ -233,7 +233,7 @@ async Coder(){
 	this.edit.coder=0;
 	if(!a){
 		this.localSet('Basic', 1);
-		console.log('failed '+c);
+		console.error('failed '+c);
 	}
 	this.render();
 }
