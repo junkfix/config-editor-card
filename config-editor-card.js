@@ -1,4 +1,4 @@
-console.info("Config Editor 4.5");
+console.info("Config Editor 4.6");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -50,7 +50,7 @@ static get styles() {
 		position:sticky;
 		z-index:2;}
 	.pin{
-		top: var(--header-height, 0);
+		top:0;
 		background:var(--secondary-background-color,silver)}
 	.bar{
 		bottom:0;
