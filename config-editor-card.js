@@ -1,4 +1,4 @@
-console.info("Config Editor 4.6");
+console.info("Config Editor 4.7");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -75,7 +75,7 @@ render(){
 	const targetver=4;
 	const hver=this._hass ? this._hass.states['config_editor.version']:{state:0};
 	const dlink=html`<a href="https://github.com/htmltiger/config-editor">download</a>`;
-	if(!hver.state){return html`<ha-card>Missing 'config_editor:' in configuration.yaml ${dlink}</ha-card>`;}
+	if(!hver || !hver.state){return html`<ha-card>Missing 'config_editor:' in configuration.yaml ${dlink}</ha-card>`;}
 	if(hver.state != targetver){return html`<ha-card>Please ${dlink} upgrade from ${hver.state} to ${targetver}</ha-card>`;}
 	if(this.fileList.length<1){
 		this.openedFile = this.localGet('Open')||'';
@@ -206,7 +206,6 @@ saveKey(e) {
 	}
 	return true;
 }
-
 
 Toast(message, duration){
 	const e = new Event("hass-notification",
