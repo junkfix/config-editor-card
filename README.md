@@ -75,3 +75,6 @@ choose the first blank in dropdown menu and type some text and hit Save or ctrl+
 | depth | `2` | subfolder depth 0 or more
 
 Please backup your files before using as there is no undo.
+---
+
+<a href="https://www.buymeacoffee.com/htmltiger" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/white_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
