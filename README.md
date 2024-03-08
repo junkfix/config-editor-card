@@ -11,7 +11,7 @@ Automaticly searches for `*.yaml` in the root and subfolders and lists in the dr
 ## Installation
 
 ### Step 1
-You will also need to install a custom component https://github.com/htmltiger/config-editor
+You will **also** need to install a custom component https://github.com/htmltiger/config-editor to reads/writes files
 
 * **[HACS](https://hacs.xyz/)**
 
@@ -77,4 +77,4 @@ choose the first blank in dropdown menu and type some text and hit Save or ctrl+
 Please backup your files before using as there is no undo.
 ---
 
-<a href="https://www.buymeacoffee.com/htmltiger" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/white_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+<a href="https://www.buymeacoffee.com/htmltiger" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/white_img.png" alt="Buy Me A Coffee"></a>
