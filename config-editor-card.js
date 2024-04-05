@@ -74,7 +74,7 @@ static get styles() {
 render(){
 	const targetver=4;
 	const hver=this._hass ? this._hass.states['config_editor.version']:{state:0};
-	const dlink=html`<a href="https://github.com/htmltiger/config-editor">download</a>`;
+	const dlink=html`<a href="https://github.com/junkfix/config-editor">download</a>`;
 	if(!hver || !hver.state){return html`<ha-card>Missing 'config_editor:' in configuration.yaml ${dlink}</ha-card>`;}
 	if(hver.state != targetver){return html`<ha-card>Please ${dlink} upgrade from ${hver.state} to ${targetver}</ha-card>`;}
 	if(this.fileList.length<1){
