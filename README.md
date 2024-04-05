@@ -4,14 +4,14 @@ Config Editor Card to edit configuration.yaml from dashboard
 Automaticly searches for `*.yaml` in the root and subfolders and lists in the dropdown menu.
 
 
-![screenshot](https://github.com/htmltiger/config-editor-card/raw/main/screenshot.png)
+![screenshot](https://github.com/junkfix/config-editor-card/raw/main/screenshot.png)
 
 
 
 ## Installation
 
 ### Step 1
-You will **also** need to install a custom component https://github.com/htmltiger/config-editor to reads/writes files
+You will **also** need to install a custom component https://github.com/junkfix/config-editor to reads/writes files
 
 * **[HACS](https://hacs.xyz/)**
 
@@ -52,7 +52,7 @@ Restart home assistant.
 
 Configuration > Dashboards > + Add dashboard
  
-create a new tab in panel mode and add the card [more info](https://github.com/htmltiger/config-editor-card/issues/29)
+create a new tab in panel mode and add the card [more info](https://github.com/junkfix/config-editor-card/issues/29)
 ```yaml
 type: custom:config-editor-card
 ```
