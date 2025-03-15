@@ -97,7 +97,7 @@ render(){
 			<button @click="${e=>this.txtSize(2)}">A</button>
 			<button @click="${e=>this.txtSize(1)}">+</button>
 			<select @change=${this.extChange}>
-			${["yaml","py","json","conf","js","txt","log","all"].map(value =>
+			${["yaml","py","json","conf","js","txt","log","jinja","all"].map(value =>
 			html`<option ?selected=${value === this.edit.ext }
 				value=${value}>${value.toUpperCase()}</option>`)}
 			</select>
