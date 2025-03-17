@@ -24,10 +24,15 @@ You will **also** need to install a custom component https://github.com/junkfix/
 
 Restart home assistant.
 
-Edit configuration.yaml and add the following so it can load
-```
-config_editor:
-```
+Do one of the following:
+
+* Settings > Devices > + Add Integration > Config Editor
+* Edit configuration.yaml and add the following so it can load
+   ```
+   config_editor:
+   ```
+
+
 Restart home assistant.
 
 ### Step 2
