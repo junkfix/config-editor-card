@@ -1,4 +1,4 @@
-console.info("Config Editor 4.7.1");
+console.info("Config Editor 5.0.0");
 const LitElement = window.LitElement || Object.getPrototypeOf(customElements.get("hui-masonry-view") );
 const html = LitElement.prototype.html;
 const css = LitElement.prototype.css;
@@ -72,11 +72,11 @@ static get styles() {
 }
 
 render(){
-	const targetver=4;
-	const hver=this._hass ? this._hass.states['config_editor.version']:{state:0};
-	const dlink=html`<a href="https://github.com/junkfix/config-editor">download</a>`;
-	if(!hver || !hver.state){return html`<ha-card>Missing 'config_editor:' in configuration.yaml ${dlink}</ha-card>`;}
-	if(hver.state != targetver){return html`<ha-card>Please ${dlink} upgrade from ${hver.state} to ${targetver}</ha-card>`;}
+	
+	const targetver=5;
+	
+	if(!this._hass){return html``;}
+
 	if(this.fileList.length<1){
 		this.openedFile = this.localGet('Open')||'';
 		this.edit.ext = this.localGet('Ext')||'yaml';
@@ -87,8 +87,13 @@ render(){
 			}
 		}else{this.List();}
 	}
+	const hver=this.edit.cver;
+	const dlink=html`<a href="https://github.com/junkfix/config-editor">download</a>`;
+
 	return html`
 	<ha-card>
+		${(!this._hass.config.components.includes("config_editor")) ? html`<div>Missing 'config_editor:' in configuration.yaml ${dlink}</div>` : ''}
+		${(hver && hver != targetver) ? html`<div>Please ${dlink} upgrade from ${hver} to ${targetver}</div>` : ''}
 		<div class="top">
 		<div class="pin">
 			<div class="left"><button @click="${this.reLoad}">Reload</button></div>
@@ -240,11 +245,14 @@ async Coder(){
 async List(){
 	this.infoLine = 'List Loading...';
 	const e=await this.cmd('list','','');
-	this.infoLine = e.msg;
-	this.fileList = e.file.slice().sort();
-	this.saveList();
-	if(this.extOk(this.openedFile)){
-		setTimeout(this.oldText, 500, this);
+	if(e){
+		this.edit.cver = e.cver;
+		this.infoLine = e.msg;
+		this.fileList = e.file.slice().sort();
+		this.saveList();
+		if(this.extOk(this.openedFile)){
+			setTimeout(this.oldText, 500, this);
+		}
 	}
 }
 
@@ -258,20 +266,23 @@ async Load(x) {
 	if(this.openedFile){
 		this.infoLine = 'Loading: '+this.openedFile;
 		const e=await this.cmd('load','',this.openedFile);
-		this.openedFile = e.file;
-		this.infoLine = e.msg;
-		this.Toast(this.infoLine,1000);
-		const uns={f:this.localGet('Open'),
-			d:this.localGet('Text')};
-		if(uns.f == this.openedFile && uns.d && uns.d != e.data){
-			this.localSet('Unsaved', uns.d);
-			this.alertLine = html`<i @click="${this.Unsave}"> 
-			Load unsaved from browser </i>`;
-		}else{
-			this.localSet('Text','');this.alertLine = '';
+		if(e){
+			this.edit.cver = e.cver;
+			this.openedFile = e.file;
+			this.infoLine = e.msg;
+			this.Toast(this.infoLine,1000);
+			const uns={f:this.localGet('Open'),
+				d:this.localGet('Text')};
+			if(uns.f == this.openedFile && uns.d && uns.d != e.data){
+				this.localSet('Unsaved', uns.d);
+				this.alertLine = html`<i @click="${this.Unsave}"> 
+				Load unsaved from browser </i>`;
+			}else{
+				this.localSet('Text','');this.alertLine = '';
+			}
+			this.renderRoot.querySelector('#code').value=e.data;
+			this.code = e.data;
 		}
-		this.renderRoot.querySelector('#code').value=e.data;
-		this.code = e.data;
 	}
 	this.edit.orgCode = this.code;
 	this.localSet('Open', this.openedFile);
@@ -298,13 +309,15 @@ async Save() {
 		if(!this.code){this.infoLine=''; this.infoLine = 'Text is empty!'; return;}
 		this.infoLine = 'Saving: '+this.openedFile;
 		const e=await this.cmd('save', this.code, this.openedFile);
-		this.infoLine = e.msg;
-		this.Toast(this.infoLine,2000);
-		if(e.msg.includes('Saved:')){
-			this.localSet('Text','');
-			if(savenew){
-				this.fileList.unshift(this.openedFile);
-				this.saveList();
+		if(e){
+			this.infoLine = e.msg;
+			this.Toast(this.infoLine,2000);
+			if(e.msg.includes('Saved:')){
+				this.localSet('Text','');
+				if(savenew){
+					this.fileList.unshift(this.openedFile);
+					this.saveList();
+				}
 			}
 		}
 	}else{this.openedFile='';}
@@ -316,7 +329,7 @@ getCardSize() {
 }
 
 setConfig(config) {
-	this.edit = {file: '', hidefooter: false, readonly: false, basic: false, size: 0, depth: 2, ext: '', orgCode: '', coder:1, ...config};
+	this.edit = {file: '', hidefooter: false, readonly: false, basic: false, size: 0, depth: 2, ext: '', orgCode: '', coder: 1, cver: 0, ...config};
 	if(this.edit.file){
 		const f=this.edit.file.split('.')[1];
 		if(f){
