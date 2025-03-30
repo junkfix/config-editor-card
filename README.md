@@ -26,7 +26,7 @@ Restart home assistant.
 
 Do one of the following:
 
-* Settings > Devices > + Add Integration > Config Editor
+* Settings > Devices > Integrations > + Add Integration > Config Editor
 * Edit configuration.yaml and add the following so it can load
    ```
    config_editor:
