@@ -48,14 +48,14 @@ Restart home assistant.
   
   add config-editor-card.js to your `<config>/www/` folder
   
-  add url `/local/config-editor-card.js?v=1` from Configuration -> Lovelace Dashboards -> Resources panel when not using YAML mode
+   Settings > Dashboards > ⋮ > Resources > + Add Resource > Javascript module > url `/local/config-editor-card.js?v=1`
 
 
 
 
 ## Add in the sidebar 
 
-Configuration > Dashboards > + Add dashboard
+Settings > Dashboards > + Add dashboard
  
 create a new tab in panel mode and add the card [more info](https://github.com/junkfix/config-editor-card/issues/29)
 ```yaml
