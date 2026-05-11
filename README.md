@@ -75,7 +75,6 @@ choose the first blank in dropdown menu and type some text and hit Save or ctrl+
 | file |  | autoload file eg. `home-assistant.log`
 | readonly | `false` | read only
 | hidefooter | `false` | 
-| basic | `false` | Force basic editor
 | size | `100` | font size
 | depth | `2` | subfolder depth 0 or more
 
