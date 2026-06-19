@@ -1,3 +1,6 @@
+### Please try this better alternative
+### https://github.com/junkfix/file-shell
+----------------------
 
 Config Editor Card to edit configuration.yaml from dashboard
 
